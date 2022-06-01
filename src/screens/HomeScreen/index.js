@@ -1,35 +1,16 @@
-import React from "react";
-import {
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import Icon from "react-native-vector-icons/Octicons";
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
+import React from 'react'
+import { InitialScreen } from '../InitialScreen';
 
-export const HomeSreen = () => {
+const Tab = createBottomTabNavigator();
+
+export const HomeScreen = () => {
   return (
-    <SafeAreaView style={styles.container}>
-      <TouchableOpacity style={styles.buttonContainer}>
-        <Icon name="list-unordered" color="white" size={80} />
-        <Text style={styles.buttonTitle}>Produtos</Text>
-      </TouchableOpacity>
-    </SafeAreaView>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  buttonContainer: {
-    width: 120,
-    padding: 10,
-    backgroundColor: "black",
-    alignItems: "center",
-    borderRadius: 10,
-  },
-  buttonTitle: {
-    color: "white",
-    fontSize: 20,
-  },
-});
+    <NavigationContainer independent={true}>
+      <Tab.Navigator>
+        <Tab.Screen name="Home" component={InitialScreen} />
+      </Tab.Navigator>
+    </NavigationContainer>
+  )
+}
