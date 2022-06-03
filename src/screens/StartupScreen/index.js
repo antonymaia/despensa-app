@@ -11,7 +11,7 @@ export const StartupScreen = ({navigation}) => {
             setLoading(true);
         }, 1500),
         setTimeout(()=>{
-            navigation.navigate('Home')
+            navigation.navigate('Routes')
         }, 3000)
     }, [])
 

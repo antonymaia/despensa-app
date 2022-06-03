@@ -1,5 +1,6 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { RouteComponent } from "./src/routes/RouteComponent";
 import { HomeScreen } from "./src/screens/HomeScreen";
 import { StartupScreen } from "./src/screens/StartupScreen";
 
@@ -13,7 +14,7 @@ export default function App() {
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Initial" component={StartupScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Routes" component={RouteComponent} />
       </Stack.Navigator>
     </NavigationContainer>
   );
