@@ -3,9 +3,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import React from 'react'
 import { CategoriaScreen } from '../screens/CategoriaScreen';
 import { HomeScreen } from '../screens/HomeScreen';
-import { ProdutoListScreen } from '../screens/ProdutoListScreen';
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { EstoqueRoutes } from './EstoqueRoutes';
+import { ProdutoListScreen } from '../screens/ProdutoListScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -17,11 +18,8 @@ export const RouteComponent = () => {
             screenOptions={{
               headerShown: false,
               tabBarStyle: {
-                padding:0,
-                marginHorizontal: 15,
-                marginBottom: 20,
-                borderRadius: 100,
-                backgroundColor: 'black'
+                borderTopWidth: 0,
+                backgroundColor: '#18112D'
               },
               tabBarItemStyle:{
                 padding:0,

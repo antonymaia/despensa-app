@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, SafeAreaView, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import { FlatList, Modal, SafeAreaView, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import { ProdutoListItem } from "./components/ProdutoListItem";
 import AntDesign from 'react-native-vector-icons/AntDesign'
+import { ProdutoDetailScreen } from "../ProdutoDetailScreen";
 
 export const ProdutoListScreen = () => {
   const [produtoList, setProdutoLis] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [modalData , setModalData] = useState({});
 
   useEffect(() => {
     fetch('https://despensaapi.herokuapp.com/produto', {
@@ -14,7 +17,7 @@ export const ProdutoListScreen = () => {
   },[])
 
   const renderProdutoListItem = ({ item }) => (
-    <ProdutoListItem produto={item} />
+    <ProdutoListItem onPress={()=> {setShowModal(true); setModalData(item)}} produto={item} />
   );
 
   return (
@@ -37,6 +40,14 @@ export const ProdutoListScreen = () => {
           renderItem={renderProdutoListItem}
         />
       </View>
+      <Modal
+        visible={showModal}
+
+      >
+        <SafeAreaView>
+        <ProdutoDetailScreen setShowModal={setShowModal} produto={modalData}/>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -44,6 +55,7 @@ export const ProdutoListScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#231942'
   },
   barraPesquisa: {
     marginHorizontal: 20,
@@ -53,19 +65,19 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flexGrow: 1,
-    padding: 10,
+    padding: 15,
     justifyContent: "center",
-    borderWidth: 2,
     borderRadius: 50,
+    backgroundColor: '#18112D'
   },
   input: {
     fontSize: 16,
+    color: 'white'
   },
   btnPesquisar: {
     marginLeft: 10,
-    backgroundColor: "black",
+    backgroundColor: '#18112D',
     borderRadius: 20,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    padding: 15,
   },
 });  
