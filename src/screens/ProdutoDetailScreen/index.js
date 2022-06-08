@@ -4,13 +4,15 @@ import { Text, View, TextInput, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
 import { Button } from "react-native-paper";
+import apiStore from "../../stores/apiStore";
 
-export const ProdutoDetailScreen = ({ produto, setShowModal }) => {
+export const ProdutoDetailScreen = ({ produto, setShowModal, setProdutoList }) => {
   const [getProduto, setProduto] = useState(produto);
   const [categorias, setCategorias] = useState([]);
+  const baseUrlApi = apiStore(state => state.baseUrlApi);
 
   useEffect(() => {
-    fetch("https://despensaapi.herokuapp.com/categoria", { method: "GET" })
+    fetch(`${baseUrlApi}/categoria`, { method: "GET" })
       .then((res) => res.json())
       .then((json) => setCategorias(json));
   }, []);
@@ -18,6 +20,24 @@ export const ProdutoDetailScreen = ({ produto, setShowModal }) => {
   const setDataValidade = (event, date) => {
     setProduto({ ...getProduto, dataValidade: date.toLocaleDateString("pt-BR") });
   };
+
+  const salvar = () => {
+    fetch(`${baseUrlApi}/produto/${getProduto.id}`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      method: "PUT",
+      body: JSON.stringify(getProduto),
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        setProdutoList([json]);
+        setShowModal(false);
+      })
+      .catch((error) => console.log(error));
+  };
+
   return (
     <View style={styles.container}>
       <View style={{ marginVertical: 20 }}>
@@ -26,6 +46,16 @@ export const ProdutoDetailScreen = ({ produto, setShowModal }) => {
           style={styles.input}
           value={getProduto.nome}
           onChangeText={(value) => setProduto({ ...getProduto, nome: value })}
+        />
+      </View>
+      <View>
+        <Text style={styles.label}>Quantidade</Text>
+        <TextInput
+          style={styles.input}
+          value={getProduto.quantidade + ""}
+          onChangeText={(value) =>
+            setProduto({ ...getProduto, quantidade: value.replace(/[^0-9]/g, "") })
+          }
         />
       </View>
       <View>
@@ -43,8 +73,14 @@ export const ProdutoDetailScreen = ({ produto, setShowModal }) => {
       <View>
         <Text style={styles.label}>Categoria:</Text>
         <View>
-          <Picker mode="dropdown"  selectedValue="0" dropdownIconColor={'white'}>
-            <Picker.Item color="white" value={0} label="Selecione uma categoria"/>
+          <Picker
+            mode="dropdown"
+            selectedValue={getProduto.categoria.id}
+            dropdownIconColor={"white"}
+            onValueChange={(itemValue, indexValue) => {
+              setProduto({ ...getProduto, categoria: { id: itemValue, nome: "" } });
+            }}
+          >
             {categorias.map((ct, index) => {
               return (
                 <Picker.Item color="white" key={index} label={ct.nome} value={ct.id} />
@@ -53,14 +89,11 @@ export const ProdutoDetailScreen = ({ produto, setShowModal }) => {
           </Picker>
         </View>
       </View>
-      <Button
-        onPress={() => {
-          console.log(getProduto);
-          setShowModal(false);
-        }}
-      >
-        Button
-      </Button>
+      <View style={styles.containerBtnSalvar}>
+        <Button color="#fff" onPress={() => salvar()}>
+          SALVAR
+        </Button>
+      </View>
     </View>
   );
 };
@@ -82,5 +115,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "white",
     borderRadius: 10,
+  },
+  containerBtnSalvar: {
+    top: 100,
   },
 });

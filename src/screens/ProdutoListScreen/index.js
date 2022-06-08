@@ -1,24 +1,56 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Modal, SafeAreaView, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  FlatList,
+  Modal,
+  SafeAreaView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { ProdutoListItem } from "./components/ProdutoListItem";
-import AntDesign from 'react-native-vector-icons/AntDesign'
+import AntDesign from "react-native-vector-icons/AntDesign";
 import { ProdutoDetailScreen } from "../ProdutoDetailScreen";
+import { ActivityIndicator } from "react-native-paper";
+import apiStore from "../../stores/apiStore";
 
 export const ProdutoListScreen = () => {
-  const [produtoList, setProdutoLis] = useState([]);
+  const [produtoList, setProdutoList] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [modalData , setModalData] = useState({});
+  const [modalData, setModalData] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const baseUrlApi = apiStore(state => state.baseUrlApi);
 
   useEffect(() => {
-    fetch('https://despensaapi.herokuapp.com/produto', {
-      method: 'GET'
-    }).then(res => res.json())
-      .then(json => setProdutoLis(json) )
-  },[])
+    updateProdutoList();
+  }, []);
 
   const renderProdutoListItem = ({ item }) => (
-    <ProdutoListItem onPress={()=> {setShowModal(true); setModalData(item)}} produto={item} />
+    <ProdutoListItem
+      onPress={() => {
+        setShowModal(true);
+        setModalData(item);
+      }}
+      produto={item}
+    />
   );
+
+  const updateProdutoList = () => {
+    fetch(`${baseUrlApi}/produto`, {
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((json) => setProdutoList(json));
+  };
+
+  const search = () => {
+    setProdutoList([]);
+    fetch(`${baseUrlApi}/produto/nome/${searchTerm}`, {
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((json) => setProdutoList(json));
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -26,26 +58,35 @@ export const ProdutoListScreen = () => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Codigo de Barras ou Nome"
+            value={searchTerm}
+            onChangeText={(value) => setSearchTerm(value)}
+            placeholder="Nome do produto"
             placeholderTextColor={"grey"}
           />
         </View>
-        <TouchableOpacity style={styles.btnPesquisar}>
+        <TouchableOpacity onPress={search} style={styles.btnPesquisar}>
           <AntDesign name="search1" color={"white"} size={20} />
         </TouchableOpacity>
       </View>
       <View>
-        <FlatList
-          data={produtoList}
-          renderItem={renderProdutoListItem}
-        />
+        {produtoList.length === 0 ? (
+          <ActivityIndicator
+            style={styles.loading}
+            animating={true}
+            size="large"
+            color="#fff"
+          />
+        ) : (
+          <FlatList data={produtoList} renderItem={renderProdutoListItem} />
+        )}
       </View>
-      <Modal
-        visible={showModal}
-
-      >
+      <Modal animationType="slide" transparent={true} visible={showModal}>
         <SafeAreaView>
-        <ProdutoDetailScreen setShowModal={setShowModal} produto={modalData}/>
+          <ProdutoDetailScreen
+            setProdutoList={setProdutoList}
+            setShowModal={setShowModal}
+            produto={modalData}
+          />
         </SafeAreaView>
       </Modal>
     </SafeAreaView>
@@ -55,7 +96,7 @@ export const ProdutoListScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#231942'
+    backgroundColor: "#231942",
   },
   barraPesquisa: {
     marginHorizontal: 20,
@@ -68,16 +109,16 @@ const styles = StyleSheet.create({
     padding: 15,
     justifyContent: "center",
     borderRadius: 50,
-    backgroundColor: '#18112D'
+    backgroundColor: "#18112D",
   },
   input: {
     fontSize: 16,
-    color: 'white'
+    color: "white",
   },
   btnPesquisar: {
     marginLeft: 10,
-    backgroundColor: '#18112D',
+    backgroundColor: "#18112D",
     borderRadius: 20,
     padding: 15,
   },
-});  
+});

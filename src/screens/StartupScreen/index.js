@@ -17,10 +17,10 @@ export const StartupScreen = ({navigation}) => {
 
     return (
         <SafeAreaView style={styles.container}>
-          <Icon name="food-bank" color={"black"} size={120}/>
+          <Icon name="food-bank" color={"#fff"} size={120}/>
           <Text style={styles.title}>Food Bank</Text>
           {loading &&
-            <ActivityIndicator style={styles.loading} animating={true} size="large" color="black"/>
+            <ActivityIndicator style={styles.loading} animating={true} size="large" color="#fff"/>
           }
         </SafeAreaView>
       );
@@ -29,12 +29,13 @@ export const StartupScreen = ({navigation}) => {
     const styles = StyleSheet.create({
       container: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: '#18112D',
         alignItems: "center",
         justifyContent: "center",
       },
       title:{
         fontSize: 25,
+        color: "#fff",
         fontWeight: "bold"
       },
       loading:{
