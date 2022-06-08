@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import React from 'react'
-import { CategoriaScreen } from '../screens/CategoriaScreen';
+import { CategoriaListScreen } from '../screens/CategoriaListScreen';
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { ProdutoListScreen } from '../screens/ProdutoListScreen';
@@ -42,7 +42,7 @@ export const RouteComponent = () => {
               }}
             />
             <Tab.Screen
-              name='Categorias' component={CategoriaScreen}
+              name='Categorias' component={CategoriaListScreen}
               options={{
                 tabBarIcon:({color}) => (
                   <AntDesign name='appstore-o' color={'white'} size={35}/>

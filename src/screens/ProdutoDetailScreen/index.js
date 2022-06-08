@@ -100,7 +100,9 @@ export const ProdutoDetailScreen = ({ produto, setShowModal, setProdutoList }) =
 
 const styles = StyleSheet.create({
   container: {
-    height: "100%",
+    height: 600,
+    marginHorizontal: 20,
+    borderRadius: 10,
     backgroundColor: "#1D1537",
     paddingHorizontal: 25,
   },
@@ -117,6 +119,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   containerBtnSalvar: {
-    top: 100,
+
   },
 });

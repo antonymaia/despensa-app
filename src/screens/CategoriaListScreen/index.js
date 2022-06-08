@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FlatList,
   Modal,
@@ -8,56 +8,40 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { ProdutoListItem } from "./components/ProdutoListItem";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import { ProdutoDetailScreen } from "../ProdutoDetailScreen";
 import { ActivityIndicator } from "react-native-paper";
+import AntDesign from "react-native-vector-icons/AntDesign";
 import apiStore from "../../stores/apiStore";
-import { useFocusEffect } from "@react-navigation/native";
+import CategoriaListItem from "./components/CategoriaListItem";
+import CategoriaModal from "./components/CategoriaModal";
 
-export const ProdutoListScreen = () => {
-  const [produtoList, setProdutoList] = useState([]);
+export const CategoriaListScreen = () => {
+  const baseUrlApi = apiStore((state) => state.baseUrlApi);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoriaList, setCategoriaList] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState({});
-  const [searchTerm, setSearchTerm] = useState("");
-  const baseUrlApi = apiStore(state => state.baseUrlApi);
 
   useEffect(() => {
-    updateProdutoList();
+    reloadCategorias();
   }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      updateProdutoList();
-    }, [])
-  );
+  const reloadCategorias = () => {
+    fetch(`${baseUrlApi}/categoria`)
+      .then((res) => res.json())
+      .then((json) => setCategoriaList(json))
+      .catch((error) => console.log("Erro na requisição", error));
+  };
 
-  const renderProdutoListItem = ({ item }) => (
-    <ProdutoListItem
+  const renderCategoriaListItem = ({ item }) => (
+    <CategoriaListItem
       onPress={() => {
         setShowModal(true);
         setModalData(item);
       }}
-      produto={item}
+      categoria={item}
     />
   );
-
-  const updateProdutoList = () => {
-    fetch(`${baseUrlApi}/produto`, {
-      method: "GET",
-    })
-      .then((res) => res.json())
-      .then((json) => setProdutoList(json));
-  };
-
-  const search = () => {
-    setProdutoList([]);
-    fetch(`${baseUrlApi}/produto/nome/${searchTerm}`, {
-      method: "GET",
-    })
-      .then((res) => res.json())
-      .then((json) => setProdutoList(json));
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -67,16 +51,16 @@ export const ProdutoListScreen = () => {
             style={styles.input}
             value={searchTerm}
             onChangeText={(value) => setSearchTerm(value)}
-            placeholder="Nome do produto"
+            placeholder="Nome da Categoria"
             placeholderTextColor={"grey"}
           />
         </View>
-        <TouchableOpacity onPress={search} style={styles.btnPesquisar}>
+        <TouchableOpacity onPress={() => {}} style={styles.btnPesquisar}>
           <AntDesign name="search1" color={"white"} size={20} />
         </TouchableOpacity>
       </View>
       <View>
-        {produtoList.length === 0 ? (
+        {categoriaList.length === 0 ? (
           <ActivityIndicator
             style={styles.loading}
             animating={true}
@@ -84,15 +68,15 @@ export const ProdutoListScreen = () => {
             color="#fff"
           />
         ) : (
-          <FlatList data={produtoList} renderItem={renderProdutoListItem} />
+          <FlatList data={categoriaList} renderItem={renderCategoriaListItem} />
         )}
       </View>
       <Modal animationType="slide" transparent={true} visible={showModal}>
         <SafeAreaView style={styles.ModalContainer}>
-          <ProdutoDetailScreen
-            setProdutoList={setProdutoList}
+          <CategoriaModal
+            categoria={modalData}
             setShowModal={setShowModal}
-            produto={modalData}
+            reloadCategorias={reloadCategorias}
           />
         </SafeAreaView>
       </Modal>
