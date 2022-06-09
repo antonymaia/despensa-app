@@ -78,7 +78,7 @@ export const ProdutoListScreen = () => {
             <AntDesign name="search1" color={"white"} size={20} />
           </TouchableOpacity>
         </View>
-        <View>
+        <View style={styles.listContainer}>
           {produtoList.length === 0 ? (
             <ActivityIndicator
               style={styles.loading}
@@ -147,6 +147,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#18112D",
     borderRadius: 20,
     padding: 15,
+  },
+  listContainer:{
+    maxHeight: 600,
   },
   bottomContainer: {
     marginHorizontal: 20,

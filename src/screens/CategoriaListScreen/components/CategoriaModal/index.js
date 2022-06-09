@@ -1,27 +1,57 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 import { Button } from "react-native-paper";
 import apiStore from "../../../../stores/apiStore";
 
-const CategoriaModal = ({ categoria, setShowModal, reloadCategorias }) => {
+const CategoriaModal = ({
+  categoria,
+  setShowModal,
+  reloadCategorias,
+  modalOperationId,
+}) => {
   const baseUrlApi = apiStore((state) => state.baseUrlApi);
   const [getCategoria, setCategoria] = useState(categoria);
 
   const salvar = () => {
-    fetch(`${baseUrlApi}/categoria/${getCategoria.id}`, {
-      method: "PUT",
-      body: JSON.stringify(getCategoria),
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((json) => {
-        reloadCategorias();
-        setShowModal(false);
+    if (modalOperationId === 1) {
+      fetch(`${baseUrlApi}/categoria/${getCategoria.id}`, {
+        method: "PUT",
+        body: JSON.stringify(getCategoria),
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
       })
-      .catch((error) => console.log("Erro na requisição", error));
+        .then((res) => res.json())
+        .then((json) => {
+          reloadCategorias();
+          setShowModal(false);
+        })
+        .catch((error) => console.log("Erro na requisição", error));
+    } else {
+      fetch(`${baseUrlApi}/categoria`, {
+        method: "POST",
+        body: JSON.stringify(getCategoria),
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .then((json) => {
+          if (json.erros != null) {
+            throw new Error(`${json.erros[0].message}`);
+          }
+          if (json.error != null && json.status != 500) {
+            throw new Error(json.message);
+          }
+          reloadCategorias();
+          setShowModal(false);
+        })
+        .catch((error) => {
+          Alert.alert("", "" + error, [{ text: "OK", onPress: () => {} }]);
+        });
+    }
   };
 
   return (
@@ -30,11 +60,16 @@ const CategoriaModal = ({ categoria, setShowModal, reloadCategorias }) => {
         <Text style={styles.label}>Nome:</Text>
         <TextInput
           style={styles.input}
-          value={getCategoria.nome}
+          value={getCategoria.nome != null ? getCategoria.nome : ""}
           onChangeText={(value) => setCategoria({ ...getCategoria, nome: value })}
         />
       </View>
       <View style={styles.containerBtnSalvar}>
+        <Button color="#fff" onPress={() => {
+          setShowModal(false)
+        }}>
+          CANCELAR
+        </Button>
         <Button color="#fff" onPress={() => salvar()}>
           SALVAR
         </Button>
@@ -62,7 +97,12 @@ const styles = StyleSheet.create({
     color: "white",
     borderRadius: 10,
   },
-  containerBtnSalvar: {},
+  containerBtnSalvar: {
+    padding: 10,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between"
+  },
 });
 
 export default CategoriaModal;

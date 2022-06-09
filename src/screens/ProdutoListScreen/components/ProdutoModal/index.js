@@ -124,6 +124,14 @@ export const ProdutoModal = ({
         </View>
       </View>
       <View style={styles.containerBtnSalvar}>
+        <Button
+          color="#fff"
+          onPress={() => {
+            setShowModal(false);
+          }}
+        >
+          CANCELAR
+        </Button>
         <Button color="#fff" onPress={() => salvar()}>
           SALVAR
         </Button>
@@ -134,7 +142,6 @@ export const ProdutoModal = ({
 
 const styles = StyleSheet.create({
   container: {
-    height: 600,
     marginHorizontal: 20,
     borderRadius: 10,
     backgroundColor: "#1D1537",
@@ -152,5 +159,10 @@ const styles = StyleSheet.create({
     color: "white",
     borderRadius: 10,
   },
-  containerBtnSalvar: {},
+  containerBtnSalvar: {
+    padding: 10,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
 });

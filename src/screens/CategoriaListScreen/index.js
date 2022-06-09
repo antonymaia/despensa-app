@@ -21,6 +21,7 @@ export const CategoriaListScreen = () => {
   const [categoriaList, setCategoriaList] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState({});
+  const [modalOperationId, setModalOperationId] = useState(0);
 
   useEffect(() => {
     reloadCategorias();
@@ -36,6 +37,7 @@ export const CategoriaListScreen = () => {
   const renderCategoriaListItem = ({ item }) => (
     <CategoriaListItem
       onPress={() => {
+        setModalOperationId(1);
         setShowModal(true);
         setModalData(item);
       }}
@@ -43,33 +45,57 @@ export const CategoriaListScreen = () => {
     />
   );
 
+  const search = () => {
+    fetch(`${baseUrlApi}/categoria/nome/${searchTerm}`)
+      .then((res) => res.json())
+      .then((json) => setCategoriaList(json))
+      .catch((error) => console.log("Erro na requisição", error));
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.barraPesquisa}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            value={searchTerm}
-            onChangeText={(value) => setSearchTerm(value)}
-            placeholder="Nome da Categoria"
-            placeholderTextColor={"grey"}
-          />
-        </View>
-        <TouchableOpacity onPress={() => {}} style={styles.btnPesquisar}>
-          <AntDesign name="search1" color={"white"} size={20} />
-        </TouchableOpacity>
-      </View>
       <View>
-        {categoriaList.length === 0 ? (
-          <ActivityIndicator
-            style={styles.loading}
-            animating={true}
-            size="large"
-            color="#fff"
-          />
-        ) : (
-          <FlatList data={categoriaList} renderItem={renderCategoriaListItem} />
-        )}
+        <View style={styles.barraPesquisa}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              value={searchTerm}
+              onChangeText={(value) => setSearchTerm(value)}
+              placeholder="Nome da Categoria"
+              placeholderTextColor={"grey"}
+            />
+          </View>
+          <TouchableOpacity onPress={search} style={styles.btnPesquisar}>
+            <AntDesign name="search1" color={"white"} size={20} />
+          </TouchableOpacity>
+        </View>
+        <View>
+          {categoriaList.length === 0 ? (
+            <ActivityIndicator
+              style={styles.loading}
+              animating={true}
+              size="large"
+              color="#fff"
+            />
+          ) : (
+            <FlatList data={categoriaList} renderItem={renderCategoriaListItem} />
+          )}
+        </View>
+      </View>
+      <View style={styles.bottomContainer}>
+        <TouchableOpacity onPress={reloadCategorias} style={{}}>
+          <AntDesign name="reload1" color={"white"} size={35} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            setModalOperationId(0);
+            setModalData({});
+            setShowModal(true);
+          }}
+          style={{ marginLeft: "auto" }}
+        >
+          <AntDesign name="pluscircle" color={"white"} size={35} />
+        </TouchableOpacity>
       </View>
       <Modal animationType="slide" transparent={true} visible={showModal}>
         <SafeAreaView style={styles.ModalContainer}>
@@ -77,6 +103,7 @@ export const CategoriaListScreen = () => {
             categoria={modalData}
             setShowModal={setShowModal}
             reloadCategorias={reloadCategorias}
+            modalOperationId={modalOperationId}
           />
         </SafeAreaView>
       </Modal>
@@ -87,6 +114,9 @@ export const CategoriaListScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: "column",
+    flexGrow: 1,
+    justifyContent: "space-between",
     backgroundColor: "#231942",
   },
   barraPesquisa: {
@@ -112,9 +142,15 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 15,
   },
+  bottomContainer: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+    display: "flex",
+    flexDirection: "row",
+  },
   ModalContainer: {
-    height: '100%',
+    height: "100%",
     justifyContent: "center",
-    backgroundColor: '#00000090',
-  }
+    backgroundColor: "#00000090",
+  },
 });
