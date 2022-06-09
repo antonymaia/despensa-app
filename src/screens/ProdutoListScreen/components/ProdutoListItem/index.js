@@ -7,7 +7,7 @@ export const ProdutoListItem = ({ produto, onPress }) => {
       <View style={{ padding: 3 }}>
         <Text style={styles.nameText}>{produto.nome}</Text>
         <Text style={{ color: "white", padding: 2 }}>
-          {"data de validade: " + produto.dataValidade}
+          {"data de validade: " + (produto.dataValidade != null ? produto.dataValidade : '')}
         </Text>
         <Text style={{ color: "white", padding: 2 }}>
           {"Categoria: " + produto.categoria.nome}

@@ -1,15 +1,20 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useEffect, useState } from "react";
-import { Text, View, TextInput, StyleSheet } from "react-native";
+import { Text, View, TextInput, StyleSheet, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
 import { Button } from "react-native-paper";
-import apiStore from "../../stores/apiStore";
+import apiStore from "../../../../stores/apiStore";
 
-export const ProdutoDetailScreen = ({ produto, setShowModal, setProdutoList }) => {
+export const ProdutoModal = ({
+  produto,
+  setShowModal,
+  setProdutoList,
+  modalOperationId,
+}) => {
   const [getProduto, setProduto] = useState(produto);
   const [categorias, setCategorias] = useState([]);
-  const baseUrlApi = apiStore(state => state.baseUrlApi);
+  const baseUrlApi = apiStore((state) => state.baseUrlApi);
 
   useEffect(() => {
     fetch(`${baseUrlApi}/categoria`, { method: "GET" })
@@ -22,20 +27,45 @@ export const ProdutoDetailScreen = ({ produto, setShowModal, setProdutoList }) =
   };
 
   const salvar = () => {
-    fetch(`${baseUrlApi}/produto/${getProduto.id}`, {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      method: "PUT",
-      body: JSON.stringify(getProduto),
-    })
-      .then((res) => res.json())
-      .then((json) => {
-        setProdutoList([json]);
-        setShowModal(false);
+    if (modalOperationId === 1) {
+      fetch(`${baseUrlApi}/produto/${getProduto.id}`, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        method: "PUT",
+        body: JSON.stringify(getProduto),
       })
-      .catch((error) => console.log(error));
+        .then((res) => res.json())
+        .then((json) => {
+          setProdutoList([json]);
+          setShowModal(false);
+        })
+        .catch((error) => console.log(error));
+    } else {
+      fetch(`${baseUrlApi}/produto`, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify(getProduto),
+      })
+        .then((res) => res.json())
+        .then((json) => {
+          if (json.erros != null) {
+            throw new Error(`${json.erros[0].message}`);
+          }
+          if (json.error != null && json.status != 500) {
+            throw new Error(json.message);
+          }
+          setProdutoList([json]);
+          setShowModal(false);
+        })
+        .catch((error) => {
+          Alert.alert("", "" + error, [{ text: "OK", onPress: () => {} }]);
+        });
+    }
   };
 
   return (
@@ -52,7 +82,7 @@ export const ProdutoDetailScreen = ({ produto, setShowModal, setProdutoList }) =
         <Text style={styles.label}>Quantidade</Text>
         <TextInput
           style={styles.input}
-          value={getProduto.quantidade + ""}
+          value={getProduto.quantidade != null ? getProduto.quantidade + "" : ""}
           onChangeText={(value) =>
             setProduto({ ...getProduto, quantidade: value.replace(/[^0-9]/g, "") })
           }
@@ -64,7 +94,11 @@ export const ProdutoDetailScreen = ({ produto, setShowModal, setProdutoList }) =
           mode="date"
           dateFormat="dd/MM/yyyy"
           value={
-            new Date(getProduto.dataValidade.split("/").reverse().join("-") + "T00:00:00")
+            getProduto.dataValidade != null
+              ? new Date(
+                  getProduto.dataValidade.split("/").reverse().join("-") + "T00:00:00"
+                )
+              : new Date()
           }
           locale="pt-BR"
           onChange={setDataValidade}
@@ -75,7 +109,7 @@ export const ProdutoDetailScreen = ({ produto, setShowModal, setProdutoList }) =
         <View>
           <Picker
             mode="dropdown"
-            selectedValue={getProduto.categoria.id}
+            selectedValue={getProduto.categoria != null ? getProduto.categoria.id : 0}
             dropdownIconColor={"white"}
             onValueChange={(itemValue, indexValue) => {
               setProduto({ ...getProduto, categoria: { id: itemValue, nome: "" } });
@@ -118,7 +152,5 @@ const styles = StyleSheet.create({
     color: "white",
     borderRadius: 10,
   },
-  containerBtnSalvar: {
-
-  },
+  containerBtnSalvar: {},
 });

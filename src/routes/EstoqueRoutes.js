@@ -1,7 +1,7 @@
 import { useRoute } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React, { useEffect } from 'react'
-import { ProdutoDetailScreen } from '../screens/ProdutoDetailScreen'
+import { ProdutoDetailScreen } from '../screens/ProdutoListScreen/components/ProdutoModal'
 import { ProdutoListScreen } from '../screens/ProdutoListScreen'
 
 const Stack = createNativeStackNavigator()

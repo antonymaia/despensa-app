@@ -8,19 +8,20 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { ProdutoListItem } from "./components/ProdutoListItem";
 import AntDesign from "react-native-vector-icons/AntDesign";
-import { ProdutoDetailScreen } from "../ProdutoDetailScreen";
 import { ActivityIndicator } from "react-native-paper";
 import apiStore from "../../stores/apiStore";
 import { useFocusEffect } from "@react-navigation/native";
+import { ProdutoModal } from "./components/ProdutoModal";
+import { ProdutoListItem } from "./components/ProdutoListItem";
 
 export const ProdutoListScreen = () => {
   const [produtoList, setProdutoList] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
-  const baseUrlApi = apiStore(state => state.baseUrlApi);
+  const [modalOperationId, setModalOperationId] = useState(0);
+  const baseUrlApi = apiStore((state) => state.baseUrlApi);
 
   useEffect(() => {
     updateProdutoList();
@@ -35,8 +36,9 @@ export const ProdutoListScreen = () => {
   const renderProdutoListItem = ({ item }) => (
     <ProdutoListItem
       onPress={() => {
-        setShowModal(true);
         setModalData(item);
+        setModalOperationId(1);
+        setShowModal(true);
       }}
       produto={item}
     />
@@ -61,38 +63,53 @@ export const ProdutoListScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.barraPesquisa}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            value={searchTerm}
-            onChangeText={(value) => setSearchTerm(value)}
-            placeholder="Nome do produto"
-            placeholderTextColor={"grey"}
-          />
-        </View>
-        <TouchableOpacity onPress={search} style={styles.btnPesquisar}>
-          <AntDesign name="search1" color={"white"} size={20} />
-        </TouchableOpacity>
-      </View>
       <View>
-        {produtoList.length === 0 ? (
-          <ActivityIndicator
-            style={styles.loading}
-            animating={true}
-            size="large"
-            color="#fff"
-          />
-        ) : (
-          <FlatList data={produtoList} renderItem={renderProdutoListItem} />
-        )}
+        <View style={styles.barraPesquisa}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              value={searchTerm}
+              onChangeText={(value) => setSearchTerm(value)}
+              placeholder="Nome do produto"
+              placeholderTextColor={"grey"}
+            />
+          </View>
+          <TouchableOpacity onPress={search} style={styles.btnPesquisar}>
+            <AntDesign name="search1" color={"white"} size={20} />
+          </TouchableOpacity>
+        </View>
+        <View>
+          {produtoList.length === 0 ? (
+            <ActivityIndicator
+              style={styles.loading}
+              animating={true}
+              size="large"
+              color="#fff"
+            />
+          ) : (
+            <FlatList data={produtoList} renderItem={renderProdutoListItem} />
+          )}
+        </View>
+      </View>
+      <View style={styles.bottomContainer}>
+        <TouchableOpacity onPress={updateProdutoList} style={{}}>
+          <AntDesign name="reload1" color={"white"} size={35} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={()=>{
+          setModalOperationId(0)
+          setModalData({})
+          setShowModal(true)
+        }} style={{marginLeft: 'auto'}}>
+          <AntDesign name="pluscircle" color={"white"} size={35} />
+        </TouchableOpacity>
       </View>
       <Modal animationType="slide" transparent={true} visible={showModal}>
         <SafeAreaView style={styles.ModalContainer}>
-          <ProdutoDetailScreen
+          <ProdutoModal
             setProdutoList={setProdutoList}
             setShowModal={setShowModal}
             produto={modalData}
+            modalOperationId={modalOperationId}
           />
         </SafeAreaView>
       </Modal>
@@ -103,6 +120,9 @@ export const ProdutoListScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: "column",
+    flexGrow: 1,
+    justifyContent: "space-between",
     backgroundColor: "#231942",
   },
   barraPesquisa: {
@@ -128,9 +148,15 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 15,
   },
+  bottomContainer: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+    display: "flex",
+    flexDirection: "row",
+  },
   ModalContainer: {
-    height: '100%',
+    height: "100%",
     justifyContent: "center",
-    backgroundColor: '#00000090',
-  }
+    backgroundColor: "#00000090",
+  },
 });
